@@ -1,19 +1,17 @@
 package com.oberasoftware.robo.pep.container;
 
-import com.google.common.collect.ImmutableMap;
 import com.oberasoftware.base.event.EventSubscribe;
 import com.oberasoftware.robo.api.GenericRobotEventHandler;
 import com.oberasoftware.robo.api.Robot;
 import com.oberasoftware.robo.api.events.DistanceSensorEvent;
 import com.oberasoftware.robo.api.sensors.EventSource;
+import com.oberasoftware.robo.core.CoreConfiguration;
 import com.oberasoftware.robo.core.SpringAwareRobotBuilder;
-import com.oberasoftware.robo.core.sensors.AnalogToDistanceConverter;
-import com.oberasoftware.robo.core.sensors.AnalogToPercentageConverter;
 import com.oberasoftware.robo.core.sensors.DistanceSensor;
-import com.oberasoftware.robo.core.sensors.GyroSensor;
+import com.oberasoftware.robo.pep.core.NaoConfiguration;
 import com.oberasoftware.robo.pep.core.NaoMotionEngine;
 import com.oberasoftware.robo.pep.core.NaoServoDriver;
-import com.oberasoftware.robo.pep.core.sensors.NaoDistanceSensorPort;
+import com.oberasoftware.robo.pep.core.sensors.NaoSensorDriver;
 import com.oberasoftware.robo.service.MotionFunction;
 import com.oberasoftware.robo.service.PositionFunction;
 import com.oberasoftware.robo.service.ServiceConfiguration;
@@ -43,7 +41,9 @@ import static com.google.common.collect.Lists.newArrayList;
         DataSourceTransactionManagerAutoConfiguration.class })
 @Import({
         ODataServiceConfiguration.class,
-        ServiceConfiguration.class
+        ServiceConfiguration.class,
+        NaoConfiguration.class,
+        CoreConfiguration.class
 })
 @ComponentScan
 public class PepContainer {
@@ -62,9 +62,7 @@ public class PepContainer {
         Robot robot = new SpringAwareRobotBuilder(context)
                 .motionEngine(NaoMotionEngine.class)
                 .servoDriver(NaoServoDriver.class)
-                .sensor(new DistanceSensor("distance", new NaoDistanceSensorPort()))
-                .sensor(new GyroSensor("gyro", adsDriver.getPort("A2"), adsDriver.getPort("A3"), new AnalogToPercentageConverter()))
-//                .remote("http:://192.168.99.100", "user", "password")
+                .sensor(new DistanceSensor("distance", NaoSensorDriver.SONAR_PORT), NaoSensorDriver.class)
                 .build();
         RobotEventHandler eventHandler = new RobotEventHandler(robot);
         robot.listen(eventHandler);
@@ -89,7 +87,7 @@ public class PepContainer {
 
             if(event.getDistance() < 20) {
                 LOG.info("Killing all tasks");
-                robot.getMotionEngine().stopAllTasks();
+                robot.getMotionEngine().stopWalking();
             }
         }
     }}

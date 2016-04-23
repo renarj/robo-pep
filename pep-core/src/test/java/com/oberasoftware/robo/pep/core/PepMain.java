@@ -54,7 +54,7 @@ public class PepMain implements EventHandler {
 
             PepMain pep = new PepMain(motion, tts);
 
-            SensorManager sensorManager = new SensorManager(session);
+            SensorManager sensorManager = new SensorManager();
             sensorManager.registerListener(pep);
 
             LOG.info("Motion summary: {}", motion.getSummary());

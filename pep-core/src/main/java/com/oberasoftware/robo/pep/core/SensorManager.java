@@ -1,7 +1,6 @@
 package com.oberasoftware.robo.pep.core;
 
 import com.aldebaran.qi.CallError;
-import com.aldebaran.qi.Session;
 import com.aldebaran.qi.helper.proxies.ALMemory;
 import com.oberasoftware.base.event.EventBus;
 import com.oberasoftware.base.event.EventHandler;
@@ -11,6 +10,8 @@ import com.oberasoftware.robo.api.exceptions.RoboException;
 import com.oberasoftware.robo.api.sensors.EventSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -23,18 +24,21 @@ import static java.util.Arrays.asList;
 /**
  * @author Renze de Vries
  */
+@Component
 public class SensorManager {
     private static final Logger LOG = LoggerFactory.getLogger(SensorManager.class);
 
-    private final ALMemory memory;
-    private final EventBus eventBus;
+    private ALMemory memory;
+    private final EventBus eventBus = new LocalEventBus();
 
     private List<Long> eventIds = new CopyOnWriteArrayList<>();
 
-    public SensorManager(Session session) {
+    @Autowired
+    private NaoSessionManager sessionManager;
+
+    public void init() {
         try {
-            this.memory = new ALMemory(session);
-            this.eventBus = new LocalEventBus();
+            this.memory = new ALMemory(sessionManager.getSession());
             eventBus.registerFilter((o, handlerEntry) -> {
                 if(o instanceof RobotEvent) {
                     RobotEvent roboEvent = (RobotEvent) o;

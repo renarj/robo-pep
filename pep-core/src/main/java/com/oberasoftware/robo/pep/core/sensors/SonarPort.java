@@ -2,14 +2,15 @@ package com.oberasoftware.robo.pep.core.sensors;
 
 import com.aldebaran.qi.CallError;
 import com.aldebaran.qi.Session;
+import com.aldebaran.qi.helper.proxies.ALMemory;
 import com.aldebaran.qi.helper.proxies.ALSonar;
 import com.oberasoftware.base.event.EventHandler;
 import com.oberasoftware.base.event.EventSubscribe;
 import com.oberasoftware.robo.api.exceptions.RoboException;
 import com.oberasoftware.robo.api.sensors.EventSource;
 import com.oberasoftware.robo.api.sensors.SensorValue;
-import com.oberasoftware.robo.pep.core.NumberEvent;
 import com.oberasoftware.robo.pep.core.SensorManager;
+import com.oberasoftware.robo.pep.core.TriggerEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,8 +19,11 @@ import org.slf4j.LoggerFactory;
  */
 public class SonarPort extends NaoMemoryPort<SensorValue<Integer>> implements EventHandler {
     private static final Logger LOG = LoggerFactory.getLogger(SonarPort.class);
+    private static final String LEFT_SONAR = "Device/SubDeviceList/US/Left/Sensor/Value";
+    private static final String RIGHT_SONAR = "Device/SubDeviceList/US/Right/Sensor/Value";
 
     private ALSonar sonar;
+    private ALMemory memory;
 
     public SonarPort(Session session, SensorManager sensorManager) {
         super(session, sensorManager);
@@ -39,6 +43,8 @@ public class SonarPort extends NaoMemoryPort<SensorValue<Integer>> implements Ev
         try {
             sonar = new ALSonar(getSession());
             sonar.subscribe(NaoSensorDriver.SUBSCRIBE_ID);
+
+            memory = new ALMemory(getSession());
             getSensorManager().registerListener(this);
             LOG.debug("SonarPort initialized");
         } catch (Exception e) {
@@ -46,11 +52,26 @@ public class SonarPort extends NaoMemoryPort<SensorValue<Integer>> implements Ev
         }
     }
 
+    private int getSensorData(ObstacleSide side) {
+        String memoryPath = side == ObstacleSide.LEFT ? LEFT_SONAR : RIGHT_SONAR;
+        try {
+            Float distance = (Float) memory.getData(memoryPath);
+            int roundedDistance = (int)(distance * 100);
+            LOG.debug("Rounded distance for path: {} is: {}", memoryPath, roundedDistance);
+            return roundedDistance;
+        } catch (CallError | InterruptedException e) {
+            LOG.error("", e);
+        }
+        return -1;
+    }
+
 
     @EventSubscribe
-    @EventSource({"Device/SubDeviceList/US/Left/Sensor/Value", "Device/SubDeviceList/US/Right/Sensor/Value"})
-    public void receive(NumberEvent numberEvent) {
-        LOG.info("Received a distance: {} from source: {}", numberEvent.getNumber(), numberEvent.getSource());
-        notify(numberEvent::getNumber);
+    @EventSource({"SonarLeftDetected", "SonarRightDetected", "SonarLeftNothingDetected", "SonarRightNothingDetected"})
+    public void receive(TriggerEvent obstacleEvent) {
+        LOG.debug("Detected an obstacle on: {} side", obstacleEvent.getSource());
+
+        notify(() -> getSensorData(ObstacleSide.LEFT));
+        notify(() -> getSensorData(ObstacleSide.RIGHT));
     }
 }

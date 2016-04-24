@@ -106,4 +106,8 @@ public class SensorManager {
             }
         });
     }
+
+    public void setSessionManager(NaoSessionManager sessionManager) {
+        this.sessionManager = sessionManager;
+    }
 }

@@ -1,6 +1,5 @@
 package com.oberasoftware.robo.pep.core;
 
-import com.aldebaran.qi.CallError;
 import com.aldebaran.qi.Session;
 import com.aldebaran.qi.helper.proxies.ALMotion;
 import com.aldebaran.qi.helper.proxies.ALRobotPosture;
@@ -41,13 +40,7 @@ public class NaoMotionEngine implements MotionEngine {
 
     @Override
     public boolean prepareWalk() {
-        try {
-            posture.applyPosture("Stand", 0.5f);
-            return true;
-        } catch (CallError | InterruptedException e) {
-            LOG.error("", e);
-            return false;
-        }
+        return safeExecuteTask(() -> posture.goToPosture("Stand", 0.5f));
     }
 
     @Override
@@ -57,12 +50,7 @@ public class NaoMotionEngine implements MotionEngine {
 
     @Override
     public MotionTask walk() {
-        try {
-            alMotion.move(1.0f, 0.0f, 0.0f);
-        } catch (CallError | InterruptedException e) {
-            LOG.error("", e);
-
-        }
+        safeExecuteTask(() -> alMotion.move(1.0f, 0.0f, 0.0f));
         return null;
     }
 
@@ -83,18 +71,21 @@ public class NaoMotionEngine implements MotionEngine {
 
     @Override
     public boolean stopAllTasks() {
-        try {
-            alMotion.killAll();
-        } catch (CallError | InterruptedException e) {
-            LOG.error("", e);
-        }
-        return false;
+        return safeExecuteTask(() -> alMotion.killAll());
     }
 
     @Override
     public boolean stopWalking() {
-        return stopAllTasks();
+        return safeExecuteTask(() -> alMotion.stopWalk());
     }
 
-
+    public boolean safeExecuteTask(NaoTask task) {
+        try {
+            task.run();
+            return true;
+        } catch (Exception e) {
+            LOG.error("Could not execute NAO Task", e);
+            return false;
+        }
+    }
 }

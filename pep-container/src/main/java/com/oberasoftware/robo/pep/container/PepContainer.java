@@ -4,7 +4,6 @@ import com.oberasoftware.base.event.EventSubscribe;
 import com.oberasoftware.robo.api.GenericRobotEventHandler;
 import com.oberasoftware.robo.api.Robot;
 import com.oberasoftware.robo.api.events.DistanceSensorEvent;
-import com.oberasoftware.robo.api.sensors.EventSource;
 import com.oberasoftware.robo.core.CoreConfiguration;
 import com.oberasoftware.robo.core.SpringAwareRobotBuilder;
 import com.oberasoftware.robo.core.sensors.DistanceSensor;
@@ -72,8 +71,7 @@ public class PepContainer {
         LOG.info("Preparing for walk");
         robot.getMotionEngine().prepareWalk();
 
-//        robot.getMotionEngine().walk();
-
+        robot.getMotionEngine().walk();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             LOG.info("Killing the robot gracefully on shutdown");
@@ -89,7 +87,7 @@ public class PepContainer {
         }
 
         @EventSubscribe
-        @EventSource("distance")
+//        @EventSource("distance")
         public void receive(DistanceSensorEvent event) {
             LOG.info("Received a distance event: {}", event);
 

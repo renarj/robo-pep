@@ -55,12 +55,13 @@ public class PepMain implements EventHandler {
             PepMain pep = new PepMain(motion, tts);
 
             SensorManager sensorManager = new SensorManager();
+            sensorManager.setSessionManager(() -> session);
+            sensorManager.init();
             sensorManager.registerListener(pep);
 
             LOG.info("Motion summary: {}", motion.getSummary());
 
             ALSonar sonar = new ALSonar(session);
-
 
             ALRobotPosture posture = new ALRobotPosture(session);
             posture.goToPosture("Stand", 0.5f);
@@ -128,19 +129,27 @@ public class PepMain implements EventHandler {
         }
     }
 
-//    @EventSubscribe
-//    @EventSource({"SonarLeftDetected", "SonarRightDetected"})
-//    public void receiveSonar(TriggerEvent triggerEvent) {
-//        if(triggerEvent.isOn()) {
-//            LOG.info("Something was detected: {}", triggerEvent.getSource());
-//        }
-//    }
-//
-//    @EventSubscribe
-//    @EventSource({"SonarLeftNothingDetected", "SonarRightNothingDetected"})
-//    public void receivePartial(TriggerEvent triggerEvent) {
-//        LOG.info("We have a partial detection, nothing found on: {}", triggerEvent.getSource());
-//    }
+    @EventSubscribe
+    @EventSource({"Device/SubDeviceList/US/Left/Sensor/Value", "Device/SubDeviceList/US/Right/Sensor/Value"})
+    public void receiveDistance(NumberEvent e) {
+        LOG.info("Received sonar: {}", e);
+    }
+
+    @EventSubscribe
+    @EventSource({"SonarLeftDetected", "SonarRightDetected"})
+    public void receiveSonar(TriggerEvent triggerEvent) {
+        if(triggerEvent.isOn()) {
+            LOG.info("Something was detected: {}", triggerEvent.getSource());
+        }
+    }
+
+    @EventSubscribe
+    @EventSource({"SonarLeftNothingDetected", "SonarRightNothingDetected"})
+    public void receivePartial(TriggerEvent triggerEvent) {
+        LOG.info("We have a partial detection, nothing found on: {}", triggerEvent.getSource());
+
+
+    }
 
     @EventSubscribe
     @EventSource({"DarknessDetection/DarknessDetected"})

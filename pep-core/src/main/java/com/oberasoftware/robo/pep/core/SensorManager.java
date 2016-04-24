@@ -38,6 +38,7 @@ public class SensorManager {
 
     public void init() {
         try {
+            LOG.info("Initializing the Sensor manager");
             this.memory = new ALMemory(sessionManager.getSession());
             eventBus.registerFilter((o, handlerEntry) -> {
                 if(o instanceof RobotEvent) {

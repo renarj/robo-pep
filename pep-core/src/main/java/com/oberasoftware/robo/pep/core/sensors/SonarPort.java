@@ -40,6 +40,7 @@ public class SonarPort extends NaoMemoryPort<SensorValue<Integer>> implements Ev
             sonar = new ALSonar(getSession());
             sonar.subscribe(NaoSensorDriver.SUBSCRIBE_ID);
             getSensorManager().registerListener(this);
+            LOG.debug("SonarPort initialized");
         } catch (Exception e) {
             throw new RoboException("Could not load robot session");
         }

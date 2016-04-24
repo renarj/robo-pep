@@ -64,8 +64,16 @@ public class PepContainer {
                 .servoDriver(NaoServoDriver.class)
                 .sensor(new DistanceSensor("distance", NaoSensorDriver.SONAR_PORT), NaoSensorDriver.class)
                 .build();
+        LOG.info("Robot has been constructed");
+
         RobotEventHandler eventHandler = new RobotEventHandler(robot);
         robot.listen(eventHandler);
+
+        LOG.info("Preparing for walk");
+        robot.getMotionEngine().prepareWalk();
+
+//        robot.getMotionEngine().walk();
+
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             LOG.info("Killing the robot gracefully on shutdown");

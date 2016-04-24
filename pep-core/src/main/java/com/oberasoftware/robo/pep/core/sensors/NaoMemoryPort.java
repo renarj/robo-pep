@@ -41,7 +41,7 @@ public abstract class NaoMemoryPort<T extends SensorValue> implements DirectPort
     }
 
     public void notify(T value) {
-        LOG.info("Notifying listeners of value: {}", value);
+        LOG.debug("Notifying listeners of value: {}", value);
         listeners.forEach(l -> l.receive(value));
     }
 

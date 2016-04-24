@@ -87,12 +87,11 @@ public class PepContainer {
         }
 
         @EventSubscribe
-//        @EventSource("distance")
         public void receive(DistanceSensorEvent event) {
             LOG.info("Received a distance event: {}", event);
 
-            if(event.getDistance() < 20) {
-                LOG.info("Killing all tasks");
+            if(event.getDistance() < 30) {
+                LOG.info("Stopping walking motion");
                 robot.getMotionEngine().stopWalking();
             }
         }

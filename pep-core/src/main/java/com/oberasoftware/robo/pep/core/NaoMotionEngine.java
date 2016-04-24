@@ -49,6 +49,11 @@ public class NaoMotionEngine implements MotionEngine {
     }
 
     @Override
+    public boolean rest() {
+        return safeExecuteTask(() -> alMotion.rest());
+    }
+
+    @Override
     public MotionTask walk() {
         safeExecuteTask(() -> alMotion.move(1.0f, 0.0f, 0.0f));
         return null;
@@ -76,7 +81,7 @@ public class NaoMotionEngine implements MotionEngine {
 
     @Override
     public boolean stopWalking() {
-        return safeExecuteTask(() -> alMotion.stopWalk());
+        return safeExecuteTask(() -> alMotion.move(0.0f, 0.0f, 0.0f));
     }
 
     public boolean safeExecuteTask(NaoTask task) {

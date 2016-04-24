@@ -32,6 +32,7 @@ public class SonarPort extends NaoMemoryPort<SensorValue<Integer>> implements Ev
     @Override
     public void close() {
         try {
+            LOG.info("Closing used Sonar resource");
             sonar.unsubscribe(NaoSensorDriver.SUBSCRIBE_ID);
         } catch (CallError | InterruptedException e) {
             LOG.error("Could not cleanly unsubscribe from sonar port", e);

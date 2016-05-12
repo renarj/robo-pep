@@ -53,6 +53,11 @@
                 <artifactId>robo-service</artifactId>
                 <version>${robo.sdk.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.oberasoftware</groupId>
+                <artifactId>robo-cloud</artifactId>
+                <version>${robo.sdk.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.oberasoftware</groupId>

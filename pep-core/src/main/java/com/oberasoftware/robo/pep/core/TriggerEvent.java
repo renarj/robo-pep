@@ -15,7 +15,17 @@ public class TriggerEvent implements RobotEvent {
     }
 
     @Override
-    public String getSource() {
+    public String getRobotName() {
+        return null;
+    }
+
+    @Override
+    public String getCapability() {
+        return null;
+    }
+
+    @Override
+    public String getSourceName() {
         return source;
     }
 

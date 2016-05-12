@@ -20,6 +20,10 @@
             <groupId>com.oberasoftware</groupId>
             <artifactId>pep-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.oberasoftware</groupId>
+            <artifactId>robo-cloud</artifactId>
+        </dependency>
     </dependencies>
 
 

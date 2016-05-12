@@ -1,6 +1,7 @@
 package com.oberasoftware.robo.pep.core;
 
 import com.aldebaran.qi.Session;
+import com.aldebaran.qi.helper.proxies.ALBehaviorManager;
 import com.aldebaran.qi.helper.proxies.ALMotion;
 import com.aldebaran.qi.helper.proxies.ALRobotPosture;
 import com.oberasoftware.robo.api.MotionEngine;
@@ -25,6 +26,7 @@ public class NaoMotionEngine implements MotionEngine {
     private NaoSessionManager sessionManager;
 
     private ALMotion alMotion;
+    private ALBehaviorManager behaviorManager;
     private ALRobotPosture posture;
 
     @Override
@@ -33,6 +35,7 @@ public class NaoMotionEngine implements MotionEngine {
             Session session = sessionManager.getSession();
             alMotion = new ALMotion(session);
             posture = new ALRobotPosture(session);
+            behaviorManager = new ALBehaviorManager(session);
         } catch (Exception e) {
             LOG.error("", e);
         }
@@ -61,6 +64,8 @@ public class NaoMotionEngine implements MotionEngine {
 
     @Override
     public MotionTask runMotion(String motionName) {
+        LOG.info("Executing motion: {}", motionName);
+        safeExecuteTask(() -> behaviorManager.runBehavior(motionName));
         return null;
     }
 

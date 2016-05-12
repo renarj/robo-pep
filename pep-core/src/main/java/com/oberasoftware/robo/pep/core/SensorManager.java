@@ -47,7 +47,7 @@ public class SensorManager {
                     EventSource eventSource = eventMethod.getAnnotation(EventSource.class);
                     if(eventSource != null) {
                         Optional<String> supportedSource = Arrays.asList(eventSource.value()).stream()
-                                .filter(s -> s.equalsIgnoreCase(roboEvent.getSource()))
+                                .filter(s -> s.equalsIgnoreCase(roboEvent.getSourceName()))
                                 .findFirst();
 
                         if(!supportedSource.isPresent()) {

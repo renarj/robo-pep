@@ -120,7 +120,7 @@ public class PepMain implements EventHandler {
     @EventSource({"FrontTactilTouched", "MiddleTactilTouched", "RearTactilTouched"})
     public void receive(TriggerEvent triggerEvent) {
         if(triggerEvent.isOn()) {
-            LOG.info("Head was touched: {}", triggerEvent.getSource());
+            LOG.info("Head was touched: {}", triggerEvent.getSourceName());
             try {
                 textToSpeech.say("I feel touched");
             } catch (CallError | InterruptedException e) {
@@ -139,14 +139,14 @@ public class PepMain implements EventHandler {
     @EventSource({"SonarLeftDetected", "SonarRightDetected"})
     public void receiveSonar(TriggerEvent triggerEvent) {
         if(triggerEvent.isOn()) {
-            LOG.info("Something was detected: {}", triggerEvent.getSource());
+            LOG.info("Something was detected: {}", triggerEvent.getSourceName());
         }
     }
 
     @EventSubscribe
     @EventSource({"SonarLeftNothingDetected", "SonarRightNothingDetected"})
     public void receivePartial(TriggerEvent triggerEvent) {
-        LOG.info("We have a partial detection, nothing found on: {}", triggerEvent.getSource());
+        LOG.info("We have a partial detection, nothing found on: {}", triggerEvent.getSourceName());
 
 
     }
@@ -154,7 +154,7 @@ public class PepMain implements EventHandler {
     @EventSubscribe
     @EventSource({"DarknessDetection/DarknessDetected"})
     public void receiveBacklight(NumberEvent numberEvent) {
-        LOG.info("Backlight detection: {} darkness: {}", numberEvent.getSource(), numberEvent.getNumber());
+        LOG.info("Backlight detection: {} darkness: {}", numberEvent.getSourceName(), numberEvent.getNumber());
 
         try {
             if(numberEvent.getNumber() > 40) {

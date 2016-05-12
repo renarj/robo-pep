@@ -1,9 +1,12 @@
 package com.oberasoftware.robo.pep.container;
 
 import com.oberasoftware.base.event.EventSubscribe;
+import com.oberasoftware.home.core.mqtt.MQTTConfiguration;
 import com.oberasoftware.robo.api.GenericRobotEventHandler;
 import com.oberasoftware.robo.api.Robot;
 import com.oberasoftware.robo.api.events.DistanceSensorEvent;
+import com.oberasoftware.robo.cloud.RemoteCloudDriver;
+import com.oberasoftware.robo.cloud.RemoteConfiguration;
 import com.oberasoftware.robo.core.CoreConfiguration;
 import com.oberasoftware.robo.core.SpringAwareRobotBuilder;
 import com.oberasoftware.robo.core.sensors.DistanceSensor;
@@ -42,7 +45,9 @@ import static com.google.common.collect.Lists.newArrayList;
         ODataServiceConfiguration.class,
         ServiceConfiguration.class,
         NaoConfiguration.class,
-        CoreConfiguration.class
+        CoreConfiguration.class,
+        RemoteConfiguration.class,
+        MQTTConfiguration.class
 })
 @ComponentScan
 public class PepContainer {
@@ -58,10 +63,11 @@ public class PepContainer {
         ODataEdmRegistry registry = context.getBean(ODataEdmRegistry.class);
         registry.registerClasses(newArrayList(MotionModel.class, ServoModel.class, MotionFunction.class, PositionFunction.class));
 
-        Robot robot = new SpringAwareRobotBuilder(context)
+        Robot robot = new SpringAwareRobotBuilder("peppy", context)
                 .motionEngine(NaoMotionEngine.class)
                 .servoDriver(NaoServoDriver.class)
                 .sensor(new DistanceSensor("distance", NaoSensorDriver.SONAR_PORT), NaoSensorDriver.class)
+                .remote(RemoteCloudDriver.class)
                 .build();
         LOG.info("Robot has been constructed");
 
@@ -71,7 +77,7 @@ public class PepContainer {
         LOG.info("Preparing for walk");
         robot.getMotionEngine().prepareWalk();
 
-        robot.getMotionEngine().walk();
+//        robot.getMotionEngine().walk();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             LOG.info("Killing the robot gracefully on shutdown");
@@ -90,9 +96,9 @@ public class PepContainer {
         public void receive(DistanceSensorEvent event) {
             LOG.info("Received a distance event: {}", event);
 
-            if(event.getDistance() < 30) {
-                LOG.info("Stopping walking motion");
-                robot.getMotionEngine().stopWalking();
-            }
+//            if(event.getDistance() < 30) {
+//                LOG.info("Stopping walking motion");
+//                robot.getMotionEngine().stopWalking();
+//            }
         }
     }}

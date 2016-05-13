@@ -72,7 +72,7 @@ public class SonarPort extends NaoMemoryPort<SensorValue<Integer>> implements Ev
     public void receive(TriggerEvent obstacleEvent) {
         LOG.debug("Detected an obstacle on: {} side", obstacleEvent.getSourceName());
 
-//        notify(() -> getSensorData(ObstacleSide.LEFT));
-//        notify(() -> getSensorData(ObstacleSide.RIGHT));
+        notify(() -> getSensorData(ObstacleSide.LEFT));
+        notify(() -> getSensorData(ObstacleSide.RIGHT));
     }
 }

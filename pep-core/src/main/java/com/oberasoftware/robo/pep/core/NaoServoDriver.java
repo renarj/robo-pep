@@ -1,9 +1,9 @@
 package com.oberasoftware.robo.pep.core;
 
 import com.aldebaran.qi.helper.proxies.ALMotion;
-import com.oberasoftware.robo.api.Servo;
-import com.oberasoftware.robo.api.ServoDriver;
 import com.oberasoftware.robo.api.commands.PositionAndSpeedCommand;
+import com.oberasoftware.robo.api.servo.Servo;
+import com.oberasoftware.robo.api.servo.ServoDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

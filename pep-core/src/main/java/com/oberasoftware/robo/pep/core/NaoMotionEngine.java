@@ -5,8 +5,9 @@ import com.aldebaran.qi.helper.proxies.ALBehaviorManager;
 import com.aldebaran.qi.helper.proxies.ALMotion;
 import com.aldebaran.qi.helper.proxies.ALRobotPosture;
 import com.oberasoftware.robo.api.MotionEngine;
-import com.oberasoftware.robo.api.MotionResource;
 import com.oberasoftware.robo.api.MotionTask;
+import com.oberasoftware.robo.api.motion.MotionResource;
+import com.oberasoftware.robo.api.motion.WalkDirection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,14 +53,25 @@ public class NaoMotionEngine implements MotionEngine {
     }
 
     @Override
-    public boolean rest() {
-        return safeExecuteTask(() -> alMotion.rest());
+    public MotionTask walkForward() {
+        return walk(WalkDirection.FORWARD);
     }
 
     @Override
-    public MotionTask walk() {
-        safeExecuteTask(() -> alMotion.move(1.0f, 0.0f, 0.0f));
+    public MotionTask walk(WalkDirection direction) {
+        if(direction == WalkDirection.BACKWARD) {
+            safeExecuteTask(() -> alMotion.move(-1.0f, 0.0f, 0.0f));
+        } else {
+            //forward
+            safeExecuteTask(() -> alMotion.move(1.0f, 0.0f, 0.0f));
+        }
+
         return null;
+    }
+
+    @Override
+    public boolean rest() {
+        return safeExecuteTask(() -> alMotion.rest());
     }
 
     @Override

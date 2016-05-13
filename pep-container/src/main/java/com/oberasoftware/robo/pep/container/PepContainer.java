@@ -1,8 +1,8 @@
 package com.oberasoftware.robo.pep.container;
 
+import com.oberasoftware.base.event.EventHandler;
 import com.oberasoftware.base.event.EventSubscribe;
 import com.oberasoftware.home.core.mqtt.MQTTConfiguration;
-import com.oberasoftware.robo.api.GenericRobotEventHandler;
 import com.oberasoftware.robo.api.Robot;
 import com.oberasoftware.robo.api.events.DistanceSensorEvent;
 import com.oberasoftware.robo.cloud.RemoteCloudDriver;
@@ -74,10 +74,8 @@ public class PepContainer {
         RobotEventHandler eventHandler = new RobotEventHandler(robot);
         robot.listen(eventHandler);
 
-        LOG.info("Preparing for walk");
+        LOG.info("Preparing for activity");
         robot.getMotionEngine().prepareWalk();
-
-//        robot.getMotionEngine().walk();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             LOG.info("Killing the robot gracefully on shutdown");
@@ -85,7 +83,7 @@ public class PepContainer {
         }));
     }
 
-    public static class RobotEventHandler implements GenericRobotEventHandler {
+    public static class RobotEventHandler implements EventHandler {
         private Robot robot;
 
         public RobotEventHandler(Robot robot) {
@@ -96,9 +94,9 @@ public class PepContainer {
         public void receive(DistanceSensorEvent event) {
             LOG.info("Received a distance event: {}", event);
 
-//            if(event.getDistance() < 30) {
-//                LOG.info("Stopping walking motion");
-//                robot.getMotionEngine().stopWalking();
-//            }
+            if(event.getDistance() < 30) {
+                LOG.info("Stopping walking motion");
+                robot.getMotionEngine().stopWalking();
+            }
         }
     }}

@@ -16,6 +16,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 
+import static com.oberasoftware.robo.pep.core.NaoUtil.safeExecuteTask;
+
 /**
  * @author Renze de Vries
  */
@@ -40,6 +42,13 @@ public class NaoMotionEngine implements MotionEngine {
         } catch (Exception e) {
             LOG.error("", e);
         }
+    }
+
+    @Override
+    public void shutdown() {
+        safeExecuteTask(() -> alMotion.killAll());
+        safeExecuteTask(() -> behaviorManager.stopAllBehaviors());
+        safeExecuteTask(() -> posture.goToPosture("Crouch", 0.5f));
     }
 
     @Override
@@ -101,13 +110,4 @@ public class NaoMotionEngine implements MotionEngine {
         return safeExecuteTask(() -> alMotion.move(0.0f, 0.0f, 0.0f));
     }
 
-    public boolean safeExecuteTask(NaoTask task) {
-        try {
-            task.run();
-            return true;
-        } catch (Exception e) {
-            LOG.error("Could not execute NAO Task", e);
-            return false;
-        }
-    }
 }

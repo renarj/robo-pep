@@ -14,6 +14,8 @@ import com.oberasoftware.robo.pep.core.TriggerEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.lang.Math.min;
+
 /**
  * @author Renze de Vries
  */
@@ -71,8 +73,8 @@ public class SonarPort extends NaoMemoryPort<SensorValue<Integer>> implements Ev
     @EventSource({"SonarLeftDetected", "SonarRightDetected", "SonarLeftNothingDetected", "SonarRightNothingDetected"})
     public void receive(TriggerEvent obstacleEvent) {
         LOG.debug("Detected an obstacle on: {} side", obstacleEvent.getSourceName());
-
-        notify(() -> getSensorData(ObstacleSide.LEFT));
-        notify(() -> getSensorData(ObstacleSide.RIGHT));
+        int left = getSensorData(ObstacleSide.LEFT);
+        int right = getSensorData(ObstacleSide.RIGHT);
+        notify(() -> min(left, right));
     }
 }

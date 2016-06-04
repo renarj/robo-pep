@@ -1,11 +1,13 @@
 package com.oberasoftware.robo.pep.core;
 
+import com.aldebaran.qi.CallError;
 import com.aldebaran.qi.Session;
 import com.aldebaran.qi.helper.proxies.ALBehaviorManager;
 import com.aldebaran.qi.helper.proxies.ALMotion;
 import com.aldebaran.qi.helper.proxies.ALRobotPosture;
 import com.oberasoftware.robo.api.MotionEngine;
 import com.oberasoftware.robo.api.MotionTask;
+import com.oberasoftware.robo.api.Robot;
 import com.oberasoftware.robo.api.motion.MotionResource;
 import com.oberasoftware.robo.api.motion.WalkDirection;
 import org.slf4j.Logger;
@@ -13,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +36,7 @@ public class NaoMotionEngine implements MotionEngine {
     private ALRobotPosture posture;
 
     @Override
-    public void activate(Map<String, String> properties) {
+    public void activate(Robot robot, Map<String, String> properties) {
         try {
             Session session = sessionManager.getSession();
             alMotion = new ALMotion(session);
@@ -48,7 +51,16 @@ public class NaoMotionEngine implements MotionEngine {
     public void shutdown() {
         safeExecuteTask(() -> alMotion.killAll());
         safeExecuteTask(() -> behaviorManager.stopAllBehaviors());
-        safeExecuteTask(() -> posture.goToPosture("Crouch", 0.5f));
+    }
+
+    @Override
+    public List<String> getMotions() {
+        try {
+            return behaviorManager.getBehaviorNames();
+        } catch (CallError | InterruptedException e) {
+            LOG.error("Could not load behaviours", e);
+            return new ArrayList<>();
+        }
     }
 
     @Override

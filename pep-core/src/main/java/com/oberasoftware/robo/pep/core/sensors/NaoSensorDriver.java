@@ -1,5 +1,6 @@
 package com.oberasoftware.robo.pep.core.sensors;
 
+import com.oberasoftware.robo.api.Robot;
 import com.oberasoftware.robo.api.exceptions.RoboException;
 import com.oberasoftware.robo.api.sensors.DirectPort;
 import com.oberasoftware.robo.api.sensors.SensorDriver;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Renze de Vries
@@ -33,12 +35,14 @@ public class NaoSensorDriver implements SensorDriver<DirectPort> {
     @Autowired
     private SensorManager sensorManager;
 
-    public void initialize() {
+    @Override
+    public void activate(Robot robot, Map<String, String> properties) {
         LOG.info("Initializing sensors");
         sensorManager.init();
     }
 
-    public void close() {
+    @Override
+    public void shutdown() {
         LOG.info("Closing sensor resources");
         memoryPorts.forEach(NaoMemoryPort::close);
 

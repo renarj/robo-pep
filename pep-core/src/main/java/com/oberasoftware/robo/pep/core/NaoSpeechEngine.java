@@ -1,6 +1,7 @@
 package com.oberasoftware.robo.pep.core;
 
 import com.aldebaran.qi.helper.proxies.ALTextToSpeech;
+import com.oberasoftware.robo.api.Robot;
 import com.oberasoftware.robo.api.SpeechEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,11 +26,11 @@ public class NaoSpeechEngine implements SpeechEngine {
 
     @Override
     public void say(String text, String language) {
-        safeExecuteTask(() -> textToSpeech.say(text, language));
+        safeExecuteTask(() -> textToSpeech.say(text));
     }
 
     @Override
-    public void activate(Map<String, String> properties) {
+    public void activate(Robot robot, Map<String, String> properties) {
         try {
             textToSpeech = new ALTextToSpeech(naoSessionManager.getSession());
         } catch (Exception e) {

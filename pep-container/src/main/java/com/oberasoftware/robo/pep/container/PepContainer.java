@@ -5,14 +5,13 @@ import com.oberasoftware.base.event.EventSubscribe;
 import com.oberasoftware.home.core.mqtt.MQTTConfiguration;
 import com.oberasoftware.robo.api.Robot;
 import com.oberasoftware.robo.api.events.DistanceSensorEvent;
+import com.oberasoftware.robo.api.events.TextualSensorEvent;
 import com.oberasoftware.robo.cloud.RemoteCloudDriver;
 import com.oberasoftware.robo.cloud.RemoteConfiguration;
 import com.oberasoftware.robo.core.CoreConfiguration;
 import com.oberasoftware.robo.core.SpringAwareRobotBuilder;
 import com.oberasoftware.robo.core.sensors.DistanceSensor;
-import com.oberasoftware.robo.pep.core.NaoConfiguration;
-import com.oberasoftware.robo.pep.core.NaoMotionEngine;
-import com.oberasoftware.robo.pep.core.NaoServoDriver;
+import com.oberasoftware.robo.pep.core.*;
 import com.oberasoftware.robo.pep.core.sensors.NaoSensorDriver;
 import com.oberasoftware.robo.service.MotionFunction;
 import com.oberasoftware.robo.service.PositionFunction;
@@ -66,6 +65,8 @@ public class PepContainer {
         Robot robot = new SpringAwareRobotBuilder("peppy", context)
                 .motionEngine(NaoMotionEngine.class)
                 .servoDriver(NaoServoDriver.class)
+                .capability(NaoSpeechEngine.class)
+                .capability(NaoQRScanner.class)
                 .sensor(new DistanceSensor("distance", NaoSensorDriver.SONAR_PORT), NaoSensorDriver.class)
                 .remote(RemoteCloudDriver.class)
                 .build();
@@ -98,5 +99,12 @@ public class PepContainer {
                 LOG.info("Stopping walking motion");
                 robot.getMotionEngine().stopWalking();
             }
+        }
+
+        @EventSubscribe
+        public void receive(TextualSensorEvent event) {
+            LOG.info("Barcode scanned: {}", event.getValue());
+
+            robot.getCapability(NaoSpeechEngine.class).say(event.getValue(), "english");
         }
     }}

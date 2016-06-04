@@ -1,6 +1,7 @@
 package com.oberasoftware.robo.pep.core;
 
 import com.aldebaran.qi.helper.proxies.ALMotion;
+import com.oberasoftware.robo.api.Robot;
 import com.oberasoftware.robo.api.commands.PositionAndSpeedCommand;
 import com.oberasoftware.robo.api.servo.Servo;
 import com.oberasoftware.robo.api.servo.ServoDriver;
@@ -57,7 +58,7 @@ public class NaoServoDriver implements ServoDriver {
     }
 
     @Override
-    public void activate(Map<String, String> properties) {
+    public void activate(Robot robot, Map<String, String> properties) {
 
     }
 }

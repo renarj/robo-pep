@@ -75,7 +75,7 @@ public class PepMain implements EventHandler {
 
 //            ALBarcodeReader barcodeReader = new ALBarcodeReader(session);
 
-            speechRecognition.setVocabulary(Lists.newArrayList("Maap", "Bun", "Kwaak", "Miep",
+            speechRecognition.setVocabulary(Lists.newArrayList("SDL", "Web", "Rocks",
                     "Hello", "World", "Who are you", "move", "left", "right"), false);
             speechRecognition.subscribe("renze");
 
@@ -122,7 +122,7 @@ public class PepMain implements EventHandler {
         if(triggerEvent.isOn()) {
             LOG.info("Head was touched: {}", triggerEvent.getSourceName());
             try {
-                textToSpeech.say("I feel touched");
+                textToSpeech.say("I am touched");
             } catch (CallError | InterruptedException e) {
                 LOG.error("", e);
             }
@@ -193,6 +193,14 @@ public class PepMain implements EventHandler {
                     } catch (CallError | InterruptedException callError) {
                         LOG.error("", callError);
                     }
+                    break;
+                case "SDL":
+                    try {
+                        textToSpeech.say("SDL that is the company where the build Tridion right, I mean SDL Web");
+                    } catch (CallError | InterruptedException callError) {
+                        LOG.error("", callError);
+                    }
+                    break;
                 default:
                     LOG.info("Unsupported movement word: {}", word);
             }

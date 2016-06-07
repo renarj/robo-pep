@@ -5,6 +5,7 @@ import com.oberasoftware.robo.api.exceptions.RoboException;
 import com.oberasoftware.robo.api.sensors.DirectPort;
 import com.oberasoftware.robo.api.sensors.SensorDriver;
 import com.oberasoftware.robo.api.sensors.SensorValue;
+import com.oberasoftware.robo.api.sensors.TriggerValue;
 import com.oberasoftware.robo.pep.core.NaoSessionManager;
 import com.oberasoftware.robo.pep.core.SensorManager;
 import org.slf4j.Logger;
@@ -28,6 +29,8 @@ public class NaoSensorDriver implements SensorDriver<DirectPort> {
     private List<NaoMemoryPort> memoryPorts = new ArrayList<>();
 
     public static final String SONAR_PORT = "sonar";
+
+    public static final String TOUCH_HEAD = "head";
 
     @Autowired
     private NaoSessionManager sessionManager;
@@ -59,8 +62,14 @@ public class NaoSensorDriver implements SensorDriver<DirectPort> {
         switch (portId) {
             case SONAR_PORT:
                 return getSonarPort();
+            case TOUCH_HEAD:
+                return getTouchHeadPort();
         }
         return null;
+    }
+
+    public DirectPort<TriggerValue> getTouchHeadPort() {
+        return initialize(new NaoTouchSensorPort(sessionManager.getSession(), sensorManager));
     }
 
     public DirectPort<SensorValue<Integer>> getSonarPort() {

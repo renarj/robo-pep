@@ -51,6 +51,7 @@ public class NaoMotionEngine implements MotionEngine {
     public void shutdown() {
         safeExecuteTask(() -> alMotion.killAll());
         safeExecuteTask(() -> behaviorManager.stopAllBehaviors());
+        rest();
     }
 
     @Override

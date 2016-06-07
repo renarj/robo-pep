@@ -15,17 +15,17 @@ public class TriggerEvent implements RobotEvent {
     }
 
     @Override
-    public String getRobotName() {
+    public String getControllerId() {
         return null;
     }
 
     @Override
-    public String getCapability() {
+    public String getItemId() {
         return null;
     }
 
     @Override
-    public String getSourceName() {
+    public String getLabel() {
         return source;
     }
 

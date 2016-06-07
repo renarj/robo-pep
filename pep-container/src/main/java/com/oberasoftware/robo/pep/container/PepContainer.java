@@ -4,14 +4,19 @@ import com.oberasoftware.base.event.EventHandler;
 import com.oberasoftware.base.event.EventSubscribe;
 import com.oberasoftware.home.core.mqtt.MQTTConfiguration;
 import com.oberasoftware.robo.api.Robot;
+import com.oberasoftware.robo.api.events.BumperEvent;
 import com.oberasoftware.robo.api.events.DistanceSensorEvent;
 import com.oberasoftware.robo.api.events.TextualSensorEvent;
 import com.oberasoftware.robo.cloud.RemoteCloudDriver;
 import com.oberasoftware.robo.cloud.RemoteConfiguration;
 import com.oberasoftware.robo.core.CoreConfiguration;
 import com.oberasoftware.robo.core.SpringAwareRobotBuilder;
-import com.oberasoftware.robo.core.sensors.DistanceSensor;
-import com.oberasoftware.robo.pep.core.*;
+import com.oberasoftware.robo.core.sensors.BumperSensor;
+import com.oberasoftware.robo.pep.core.NaoConfiguration;
+import com.oberasoftware.robo.pep.core.NaoMotionEngine;
+import com.oberasoftware.robo.pep.core.NaoQRScanner;
+import com.oberasoftware.robo.pep.core.NaoServoDriver;
+import com.oberasoftware.robo.pep.core.NaoSpeechEngine;
 import com.oberasoftware.robo.pep.core.sensors.NaoSensorDriver;
 import com.oberasoftware.robo.service.MotionFunction;
 import com.oberasoftware.robo.service.PositionFunction;
@@ -67,7 +72,8 @@ public class PepContainer {
                 .servoDriver(NaoServoDriver.class)
                 .capability(NaoSpeechEngine.class)
                 .capability(NaoQRScanner.class)
-                .sensor(new DistanceSensor("distance", NaoSensorDriver.SONAR_PORT), NaoSensorDriver.class)
+//                .sensor(new DistanceSensor("distance", NaoSensorDriver.SONAR_PORT), NaoSensorDriver.class)
+                .sensor(new BumperSensor("head", NaoSensorDriver.TOUCH_HEAD), NaoSensorDriver.class)
                 .remote(RemoteCloudDriver.class)
                 .build();
         LOG.info("Robot has been constructed");
@@ -75,8 +81,8 @@ public class PepContainer {
         RobotEventHandler eventHandler = new RobotEventHandler(robot);
         robot.listen(eventHandler);
 
-        LOG.info("Preparing for activity");
-        robot.getMotionEngine().prepareWalk();
+//        LOG.info("Preparing for activity");
+//        robot.getMotionEngine().prepareWalk();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             LOG.info("Killing the robot gracefully on shutdown");
@@ -106,5 +112,10 @@ public class PepContainer {
             LOG.info("Barcode scanned: {}", event.getValue());
 
             robot.getCapability(NaoSpeechEngine.class).say(event.getValue(), "english");
+        }
+
+        @EventSubscribe
+        public void receive(BumperEvent event) {
+            LOG.info("Head was touched on: {}", event.getLabel());
         }
     }}

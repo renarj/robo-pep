@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -36,6 +37,7 @@ public class SensorManager {
     @Autowired
     private NaoSessionManager sessionManager;
 
+    @PostConstruct
     public void init() {
         try {
             LOG.info("Initializing the Sensor manager");
@@ -47,7 +49,7 @@ public class SensorManager {
                     EventSource eventSource = eventMethod.getAnnotation(EventSource.class);
                     if(eventSource != null) {
                         Optional<String> supportedSource = Arrays.asList(eventSource.value()).stream()
-                                .filter(s -> s.equalsIgnoreCase(roboEvent.getSourceName()))
+                                .filter(s -> s.equalsIgnoreCase(roboEvent.getLabel()))
                                 .findFirst();
 
                         if(!supportedSource.isPresent()) {

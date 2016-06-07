@@ -100,7 +100,7 @@ public class PepMain implements EventHandler {
             }));
 
             String language = tts.getLanguage();
-            tts.say("Let's rule the world together in " + language);
+            tts.say("Hello everyone, my name is Pep");
 
             sonar.subscribe("renze");
             ballDetection.subscribe("renze");
@@ -120,7 +120,7 @@ public class PepMain implements EventHandler {
     @EventSource({"FrontTactilTouched", "MiddleTactilTouched", "RearTactilTouched"})
     public void receive(TriggerEvent triggerEvent) {
         if(triggerEvent.isOn()) {
-            LOG.info("Head was touched: {}", triggerEvent.getSourceName());
+            LOG.info("Head was touched: {}", triggerEvent.getLabel());
             try {
                 textToSpeech.say("I am touched");
             } catch (CallError | InterruptedException e) {
@@ -139,26 +139,31 @@ public class PepMain implements EventHandler {
     @EventSource({"SonarLeftDetected", "SonarRightDetected"})
     public void receiveSonar(TriggerEvent triggerEvent) {
         if(triggerEvent.isOn()) {
-            LOG.info("Something was detected: {}", triggerEvent.getSourceName());
+            LOG.info("Something was detected: {}", triggerEvent.getLabel());
+            try {
+                textToSpeech.say("Oops, i detected an obstacle");
+            } catch (CallError | InterruptedException e) {
+                LOG.error("", e);
+            }
         }
     }
 
     @EventSubscribe
     @EventSource({"SonarLeftNothingDetected", "SonarRightNothingDetected"})
     public void receivePartial(TriggerEvent triggerEvent) {
-        LOG.info("We have a partial detection, nothing found on: {}", triggerEvent.getSourceName());
+        LOG.info("We have a partial detection, nothing found on: {}", triggerEvent.getLabel());
 
 
     }
 
-    @EventSubscribe
-    @EventSource({"DarknessDetection/DarknessDetected"})
+//    @EventSubscribe
+//    @EventSource({"DarknessDetection/DarknessDetected"})
     public void receiveBacklight(NumberEvent numberEvent) {
-        LOG.info("Backlight detection: {} darkness: {}", numberEvent.getSourceName(), numberEvent.getNumber());
+        LOG.info("Backlight detection: {} darkness: {}", numberEvent.getLabel(), numberEvent.getNumber());
 
         try {
             if(numberEvent.getNumber() > 40) {
-                textToSpeech.say("Man it is kind of dark here");
+                textToSpeech.say("It is kind of dark here");
             } else {
                 textToSpeech.say("That is better");
             }

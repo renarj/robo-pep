@@ -1,6 +1,6 @@
 package com.oberasoftware.robo.pep.core;
 
-import com.aldebaran.qi.helper.proxies.ALTextToSpeech;
+import com.aldebaran.qi.helper.proxies.ALAnimatedSpeech;
 import com.oberasoftware.robo.api.Robot;
 import com.oberasoftware.robo.api.SpeechEngine;
 import org.slf4j.Logger;
@@ -22,7 +22,7 @@ public class NaoSpeechEngine implements SpeechEngine {
     @Autowired
     private NaoSessionManager naoSessionManager;
 
-    private ALTextToSpeech textToSpeech;
+    private ALAnimatedSpeech textToSpeech;
 
     @Override
     public void say(String text, String language) {
@@ -32,7 +32,7 @@ public class NaoSpeechEngine implements SpeechEngine {
     @Override
     public void activate(Robot robot, Map<String, String> properties) {
         try {
-            textToSpeech = new ALTextToSpeech(naoSessionManager.getSession());
+            textToSpeech = new ALAnimatedSpeech(naoSessionManager.getSession());
         } catch (Exception e) {
             LOG.error("Could not create text to speech proxy", e);
         }

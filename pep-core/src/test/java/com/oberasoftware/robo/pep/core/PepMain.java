@@ -136,7 +136,7 @@ public class PepMain implements EventHandler {
     }
 
     @EventSubscribe
-    @EventSource({"SonarLeftDetected", "SonarRightDetected"})
+//    @EventSource({"SonarLeftDetected", "SonarRightDetected"})
     public void receiveSonar(TriggerEvent triggerEvent) {
         if(triggerEvent.isOn()) {
             LOG.info("Something was detected: {}", triggerEvent.getLabel());
@@ -149,7 +149,7 @@ public class PepMain implements EventHandler {
     }
 
     @EventSubscribe
-    @EventSource({"SonarLeftNothingDetected", "SonarRightNothingDetected"})
+//    @EventSource({"SonarLeftNothingDetected", "SonarRightNothingDetected"})
     public void receivePartial(TriggerEvent triggerEvent) {
         LOG.info("We have a partial detection, nothing found on: {}", triggerEvent.getLabel());
 

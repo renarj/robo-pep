@@ -33,14 +33,14 @@ public class NaoMotionEngine implements MotionEngine {
 
     private ALMotion alMotion;
     private ALBehaviorManager behaviorManager;
-    private ALRobotPosture posture;
+    private ALRobotPosture alPosture;
 
     @Override
     public void activate(Robot robot, Map<String, String> properties) {
         try {
             Session session = sessionManager.getSession();
             alMotion = new ALMotion(session);
-            posture = new ALRobotPosture(session);
+            alPosture = new ALRobotPosture(session);
             behaviorManager = new ALBehaviorManager(session);
         } catch (Exception e) {
             LOG.error("", e);
@@ -66,12 +66,19 @@ public class NaoMotionEngine implements MotionEngine {
 
     @Override
     public boolean prepareWalk() {
-        return safeExecuteTask(() -> posture.goToPosture("Stand", 0.5f));
+        return safeExecuteTask(() -> alPosture.goToPosture("Stand", 0.5f));
     }
 
     @Override
     public void loadResource(MotionResource resource) {
 
+    }
+
+    @Override
+    public MotionTask goToPosture(String posture) {
+        safeExecuteTask(() -> alPosture.goToPosture(posture, 0.5f));
+
+        return null;
     }
 
     @Override
@@ -86,6 +93,18 @@ public class NaoMotionEngine implements MotionEngine {
         } else {
             //forward
             safeExecuteTask(() -> alMotion.move(1.0f, 0.0f, 0.0f));
+        }
+        safeExecuteTask(() -> alMotion.waitUntilMoveIsFinished());
+
+        return null;
+    }
+
+    @Override
+    public MotionTask walk(WalkDirection walkDirection, int i) {
+        if(walkDirection == WalkDirection.FORWARD) {
+            safeExecuteTask(() -> alMotion.moveTo((float) i, 0f, 0.0f));
+        } else {
+            safeExecuteTask(() -> alMotion.moveTo(-(float) i, 0f, 0.0f));
         }
 
         return null;

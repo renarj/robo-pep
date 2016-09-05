@@ -30,7 +30,7 @@ public class NaoTouchSensorPort extends NaoMemoryPort<TriggerValue> implements E
     @EventSubscribe
     @EventSource({"FrontTactilTouched", "MiddleTactilTouched", "RearTactilTouched"})
     public void receive(TriggerEvent triggerEvent) {
-        LOG.debug("Head was touched on spot: {}", triggerEvent.getLabel());
+        LOG.info("Head was touched on spot: {} is on: {}", triggerEvent.getLabel(), triggerEvent.isOn());
 
         notify(new TriggerValue() {
             @Override

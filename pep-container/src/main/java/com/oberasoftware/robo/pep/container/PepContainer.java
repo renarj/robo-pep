@@ -2,21 +2,21 @@ package com.oberasoftware.robo.pep.container;
 
 import com.oberasoftware.base.event.EventHandler;
 import com.oberasoftware.base.event.EventSubscribe;
+import com.oberasoftware.home.api.model.BasicCommandBuilder;
 import com.oberasoftware.home.core.mqtt.MQTTConfiguration;
+import com.oberasoftware.robo.api.RemoteDriver;
 import com.oberasoftware.robo.api.Robot;
+import com.oberasoftware.robo.api.SpeechEngine;
 import com.oberasoftware.robo.api.events.BumperEvent;
 import com.oberasoftware.robo.api.events.DistanceSensorEvent;
 import com.oberasoftware.robo.api.events.TextualSensorEvent;
+import com.oberasoftware.robo.api.motion.WalkDirection;
 import com.oberasoftware.robo.cloud.RemoteCloudDriver;
 import com.oberasoftware.robo.cloud.RemoteConfiguration;
 import com.oberasoftware.robo.core.CoreConfiguration;
 import com.oberasoftware.robo.core.SpringAwareRobotBuilder;
 import com.oberasoftware.robo.core.sensors.BumperSensor;
-import com.oberasoftware.robo.pep.core.NaoConfiguration;
-import com.oberasoftware.robo.pep.core.NaoMotionEngine;
-import com.oberasoftware.robo.pep.core.NaoQRScanner;
-import com.oberasoftware.robo.pep.core.NaoServoDriver;
-import com.oberasoftware.robo.pep.core.NaoSpeechEngine;
+import com.oberasoftware.robo.pep.core.*;
 import com.oberasoftware.robo.pep.core.sensors.NaoSensorDriver;
 import com.oberasoftware.robo.service.MotionFunction;
 import com.oberasoftware.robo.service.PositionFunction;
@@ -83,6 +83,9 @@ public class PepContainer {
 
 //        LOG.info("Preparing for activity");
 //        robot.getMotionEngine().prepareWalk();
+        robot.getMotionEngine().prepareWalk();
+        robot.getMotionEngine().walk(WalkDirection.FORWARD, 1);
+        robot.getMotionEngine().goToPosture("Sit");
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             LOG.info("Killing the robot gracefully on shutdown");
@@ -116,6 +119,39 @@ public class PepContainer {
 
         @EventSubscribe
         public void receive(BumperEvent event) {
-            LOG.info("Head was touched on: {}", event.getLabel());
+            String source = event.getValue().getSource();
+            String trainId = "1005";
+            if(event.isTriggered()) {
+                LOG.info("Head was touched on: {}", event.getLabel());
+                RemoteDriver remoteDriver = robot.getRemoteDriver();
+
+                if(source.equalsIgnoreCase("MiddleTactilTouched")) {
+                    robot.getCapability(SpeechEngine.class).say("I am so sad, I want to play more", "english");
+                    remoteDriver.publish(BasicCommandBuilder.create("ecos")
+                            .item("train").label("speed")
+                            .property("trainId", trainId)
+                            .property("speed", "0").build());
+                } else if(source.equalsIgnoreCase("FrontTactilTouched")){
+                    robot.getCapability(SpeechEngine.class).say("Cool let's play with the train", "english");
+                    startTrain(remoteDriver, trainId, "forward");
+                } else {
+                    startTrain(remoteDriver, trainId, "backward");
+                }
+            }
         }
-    }}
+    }
+
+    private static void startTrain(RemoteDriver remoteDriver, String trainId, String direction) {
+        remoteDriver.publish(BasicCommandBuilder.create("ecos")
+                .item("train").label("control")
+                .property("trainId", trainId).build());
+        remoteDriver.publish(BasicCommandBuilder.create("ecos")
+                .item("train").label("direction")
+                .property("trainId", trainId)
+                .property("direction", direction).build());
+        remoteDriver.publish(BasicCommandBuilder.create("ecos")
+                .item("train").label("speed")
+                .property("trainId", trainId)
+                .property("speed", "127").build());
+    }
+}

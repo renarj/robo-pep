@@ -1,4 +1,4 @@
-package com.oberasoftware.robo.pep.core;
+package com.oberasoftware.robo.pep.core.motion;
 
 import com.aldebaran.qi.CallError;
 import com.aldebaran.qi.Session;
@@ -8,8 +8,11 @@ import com.aldebaran.qi.helper.proxies.ALRobotPosture;
 import com.oberasoftware.robo.api.MotionEngine;
 import com.oberasoftware.robo.api.MotionTask;
 import com.oberasoftware.robo.api.Robot;
+import com.oberasoftware.robo.api.motion.KeyFrame;
 import com.oberasoftware.robo.api.motion.MotionResource;
 import com.oberasoftware.robo.api.motion.WalkDirection;
+import com.oberasoftware.robo.api.motion.controller.MotionController;
+import com.oberasoftware.robo.pep.core.NaoSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.oberasoftware.robo.pep.core.NaoUtil.safeExecuteTask;
 
@@ -30,6 +34,9 @@ public class NaoMotionEngine implements MotionEngine {
 
     @Autowired
     private NaoSessionManager sessionManager;
+
+    @Autowired
+    private HandsMotionController handsMotionController;
 
     private ALMotion alMotion;
     private ALBehaviorManager behaviorManager;
@@ -52,6 +59,19 @@ public class NaoMotionEngine implements MotionEngine {
         safeExecuteTask(() -> alMotion.killAll());
         safeExecuteTask(() -> behaviorManager.stopAllBehaviors());
         rest();
+    }
+
+    @Override
+    public <T extends MotionController> Optional<T> getMotionController(String controllerName) {
+        if(controllerName.equalsIgnoreCase("hands")) {
+            return Optional.of((T)handsMotionController);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public KeyFrame getCurrentPositionAsKeyFrame() {
+        return null;
     }
 
     @Override
@@ -100,11 +120,11 @@ public class NaoMotionEngine implements MotionEngine {
     }
 
     @Override
-    public MotionTask walk(WalkDirection walkDirection, int i) {
+    public MotionTask walk(WalkDirection walkDirection, float i) {
         if(walkDirection == WalkDirection.FORWARD) {
-            safeExecuteTask(() -> alMotion.moveTo((float) i, 0f, 0.0f));
+            safeExecuteTask(() -> alMotion.moveTo(i, 0f, 0.0f));
         } else {
-            safeExecuteTask(() -> alMotion.moveTo(-(float) i, 0f, 0.0f));
+            safeExecuteTask(() -> alMotion.moveTo(-i, 0f, 0.0f));
         }
 
         return null;

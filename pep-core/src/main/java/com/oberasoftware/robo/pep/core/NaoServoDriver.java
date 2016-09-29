@@ -53,6 +53,21 @@ public class NaoServoDriver implements ServoDriver {
     }
 
     @Override
+    public boolean setTorgue(String servoId, int limit) {
+        return false;
+    }
+
+    @Override
+    public boolean setTorgue(String servoId, boolean state) {
+        return false;
+    }
+
+    @Override
+    public Servo getServo(String servoId) {
+        return null;
+    }
+
+    @Override
     public void shutdown() {
 
     }

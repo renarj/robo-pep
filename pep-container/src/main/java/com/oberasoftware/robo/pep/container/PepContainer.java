@@ -10,13 +10,13 @@ import com.oberasoftware.robo.api.SpeechEngine;
 import com.oberasoftware.robo.api.events.BumperEvent;
 import com.oberasoftware.robo.api.events.DistanceSensorEvent;
 import com.oberasoftware.robo.api.events.TextualSensorEvent;
-import com.oberasoftware.robo.api.motion.WalkDirection;
 import com.oberasoftware.robo.cloud.RemoteCloudDriver;
 import com.oberasoftware.robo.cloud.RemoteConfiguration;
 import com.oberasoftware.robo.core.CoreConfiguration;
 import com.oberasoftware.robo.core.SpringAwareRobotBuilder;
 import com.oberasoftware.robo.core.sensors.BumperSensor;
 import com.oberasoftware.robo.pep.core.*;
+import com.oberasoftware.robo.pep.core.motion.NaoMotionEngine;
 import com.oberasoftware.robo.pep.core.sensors.NaoSensorDriver;
 import com.oberasoftware.robo.service.MotionFunction;
 import com.oberasoftware.robo.service.PositionFunction;
@@ -81,17 +81,13 @@ public class PepContainer {
         RobotEventHandler eventHandler = new RobotEventHandler(robot);
         robot.listen(eventHandler);
 
-//        LOG.info("Preparing for activity");
-//        robot.getMotionEngine().prepareWalk();
-        robot.getMotionEngine().prepareWalk();
-        robot.getMotionEngine().walk(WalkDirection.FORWARD, 1);
-        robot.getMotionEngine().goToPosture("Sit");
-
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             LOG.info("Killing the robot gracefully on shutdown");
+            robot.getMotionEngine().prepareWalk();
             robot.shutdown();
         }));
     }
+
 
     public static class RobotEventHandler implements EventHandler {
         private Robot robot;
@@ -145,6 +141,10 @@ public class PepContainer {
         remoteDriver.publish(BasicCommandBuilder.create("ecos")
                 .item("train").label("control")
                 .property("trainId", trainId).build());
+        remoteDriver.publish(BasicCommandBuilder.create("ecos")
+                .item("train").label("light")
+                .property("trainId", trainId)
+                .property("state", "on").build());
         remoteDriver.publish(BasicCommandBuilder.create("ecos")
                 .item("train").label("direction")
                 .property("trainId", trainId)

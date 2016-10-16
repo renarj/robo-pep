@@ -9,6 +9,7 @@ import com.oberasoftware.robo.api.MotionEngine;
 import com.oberasoftware.robo.api.MotionTask;
 import com.oberasoftware.robo.api.Robot;
 import com.oberasoftware.robo.api.motion.KeyFrame;
+import com.oberasoftware.robo.api.motion.Motion;
 import com.oberasoftware.robo.api.motion.MotionResource;
 import com.oberasoftware.robo.api.motion.WalkDirection;
 import com.oberasoftware.robo.api.motion.controller.MotionController;
@@ -35,7 +36,6 @@ public class NaoMotionEngine implements MotionEngine {
     @Autowired
     private NaoSessionManager sessionManager;
 
-    @Autowired
     private HandsMotionController handsMotionController;
 
     private ALMotion alMotion;
@@ -49,6 +49,8 @@ public class NaoMotionEngine implements MotionEngine {
             alMotion = new ALMotion(session);
             alPosture = new ALRobotPosture(session);
             behaviorManager = new ALBehaviorManager(session);
+
+            handsMotionController = new HandsMotionController(alMotion);
         } catch (Exception e) {
             LOG.error("", e);
         }
@@ -95,6 +97,16 @@ public class NaoMotionEngine implements MotionEngine {
     }
 
     @Override
+    public MotionTask runMotion(Motion motion) {
+        return null;
+    }
+
+    @Override
+    public MotionTask runMotion(KeyFrame keyFrame) {
+        return null;
+    }
+
+    @Override
     public MotionTask goToPosture(String posture) {
         safeExecuteTask(() -> alPosture.goToPosture(posture, 0.5f));
 
@@ -108,12 +120,27 @@ public class NaoMotionEngine implements MotionEngine {
 
     @Override
     public MotionTask walk(WalkDirection direction) {
-        if(direction == WalkDirection.BACKWARD) {
-            safeExecuteTask(() -> alMotion.move(-1.0f, 0.0f, 0.0f));
-        } else {
-            //forward
-            safeExecuteTask(() -> alMotion.move(1.0f, 0.0f, 0.0f));
+        switch (direction) {
+            case STOP:
+                stopWalking();
+                break;
+            case LEFT:
+                safeExecuteTask(() -> alMotion.move(1.0f, 1.0f, 0.0f));
+                break;
+            case RIGHT:
+                safeExecuteTask(() -> alMotion.move(1.0f, -1.0f, 0.0f));
+                break;
+            case BACKWARD:
+                safeExecuteTask(() -> alMotion.move(-1.0f, 0.0f, 0.0f));
+                break;
+            case FORWARD:
+                safeExecuteTask(() -> alMotion.move(1.0f, 0.0f, 0.0f));
+                break;
+            default:
+                safeExecuteTask(() -> alMotion.move(1.0f, 0.0f, 0.0f));
+                break;
         }
+
         safeExecuteTask(() -> alMotion.waitUntilMoveIsFinished());
 
         return null;
@@ -159,6 +186,7 @@ public class NaoMotionEngine implements MotionEngine {
 
     @Override
     public boolean stopWalking() {
+        LOG.info("Stop walking");
         return safeExecuteTask(() -> alMotion.move(0.0f, 0.0f, 0.0f));
     }
 

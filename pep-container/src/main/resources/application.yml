@@ -1,0 +1,13 @@
+mqtt.host: mqtt.robot.renarj.nl
+nao.url: tcp://peppy.local:9559
+server.port: 9050
+---
+spring:
+    profiles: production
+mqtt:
+  host: ${mqtt_host}
+  port: ${mqtt_port}
+nao:
+  url: tcp://192.168.0.3:9559
+server:
+  port: 9050

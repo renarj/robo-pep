@@ -3,24 +3,26 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.oberasoftware</groupId>
+        <artifactId>oss-maven</artifactId>
+        <version>1.0.2</version>
+    </parent>
+
     <packaging>pom</packaging>
     <modules>
         <module>pep-container</module>
         <module>pep-core</module>
     </modules>
 
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.2.6.RELEASE</version>
-    </parent>
-
-    <groupId>com.oberasoftware</groupId>
     <artifactId>robo-pep</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
         <robo.sdk.version>1.0-SNAPSHOT</robo.sdk.version>
+        <docker.image.prefix>robo-pep</docker.image.prefix>
+
     </properties>
 
     <repositories>
@@ -41,6 +43,11 @@
             <dependency>
                 <groupId>com.aldebaran</groupId>
                 <artifactId>naosdk-mac</artifactId>
+                <version>2.1.4.13</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aldebaran</groupId>
+                <artifactId>naosdk-linux64</artifactId>
                 <version>2.1.4.13</version>
             </dependency>
             <dependency>
@@ -78,10 +85,6 @@
             <artifactId>guava</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.aldebaran</groupId>
-            <artifactId>naosdk-mac</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
@@ -103,5 +106,62 @@
                 </configuration>
             </plugin>
         </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.spotify</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>0.4.13</version>
+                    <configuration>
+                        <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
+                        <dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
+                        <resources>
+                            <resource>
+                                <targetPath>/</targetPath>
+                                <directory>${project.build.directory}</directory>
+                                <include>${project.build.finalName}.jar</include>
+                            </resource>
+                            <resource>
+                                <targetPath>/</targetPath>
+                                <directory>${project.basedir}/src/main/resources</directory>
+                                <include>start.sh</include>
+                            </resource>
+                        </resources>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>repackage</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
+
+    <profiles>
+        <profile>
+            <id>mac</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.aldebaran</groupId>
+                    <artifactId>naosdk-mac</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>docker</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.aldebaran</groupId>
+                    <artifactId>naosdk-linux64</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>

@@ -30,14 +30,14 @@ public class HandsMotionController implements HandsController {
         NaoUtil.safeExecuteTask(() -> {
             switch(hand_id) {
                 case LEFT:
-                    alMotion.openHand("LHand");
+                    alMotion.async().openHand("LHand");
                     break;
                 case RIGHT:
-                    alMotion.openHand("RHand");
+                    alMotion.async().openHand("RHand");
                     break;
                 case ALL:
-                    alMotion.openHand("LHand");
-                    alMotion.openHand("RHand");
+                    alMotion.async().openHand("LHand");
+                    alMotion.async().openHand("RHand");
                     break;
             }
         });
@@ -48,14 +48,14 @@ public class HandsMotionController implements HandsController {
         NaoUtil.safeExecuteTask(() -> {
             switch(hand_id) {
                 case LEFT:
-                    alMotion.closeHand("LHand");
+                    alMotion.async().closeHand("LHand");
                     break;
                 case RIGHT:
-                    alMotion.closeHand("RHand");
+                    alMotion.async().closeHand("RHand");
                     break;
                 case ALL:
-                    alMotion.closeHand("LHand");
-                    alMotion.closeHand("RHand");
+                    alMotion.async().closeHand("LHand");
+                    alMotion.async().closeHand("RHand");
                     break;
             }
         });

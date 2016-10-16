@@ -16,9 +16,5 @@
             <groupId>com.oberasoftware</groupId>
             <artifactId>robo-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.aldebaran</groupId>
-            <artifactId>naosdk-mac</artifactId>
-        </dependency>
     </dependencies>
 </project>
